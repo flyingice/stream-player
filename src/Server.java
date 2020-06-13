@@ -16,7 +16,7 @@ public class Server extends JFrame implements ActionListener {
 
     //RTP variables:
     //----------------
-    DatagramSocket RTPsocket; //socket to be used to send and receive UDP packets
+    DatagramSocket RTPSocket; //socket to be used to send and receive UDP packets
     DatagramPacket senddp; //UDP packet containing the video frames
 
     InetAddress ClientIPAddr; //Client IP address
@@ -141,7 +141,7 @@ public class Server extends JFrame implements ActionListener {
                 theServer.video = new VideoStream(VideoFileName);
 
                 //init RTP socket
-                theServer.RTPsocket = new DatagramSocket();
+                theServer.RTPSocket = new DatagramSocket();
             }
         }
 
@@ -179,7 +179,7 @@ public class Server extends JFrame implements ActionListener {
                 theServer.timer.stop();
                 //close sockets
                 theServer.RTSPsocket.close();
-                theServer.RTPsocket.close();
+                theServer.RTPSocket.close();
 
                 System.exit(0);
             }
@@ -214,11 +214,11 @@ public class Server extends JFrame implements ActionListener {
 
                 //send the packet as a DatagramPacket over the UDP socket 
                 senddp = new DatagramPacket(packet_bits, packet_length, ClientIPAddr, RTP_dest_port);
-                RTPsocket.send(senddp);
+                RTPSocket.send(senddp);
 
-                //System.out.println("Send frame #"+imagenb);
+                System.out.println("Send frame #"+imagenb);
                 //print the header bitstream
-                rtp_packet.printheader();
+                //rtp_packet.printheader();
 
                 //update GUI
                 label.setText("Send frame #" + imagenb);
@@ -242,6 +242,7 @@ public class Server extends JFrame implements ActionListener {
     private int parse_RTSP_request()
     {
         int request_type = -1;
+
         try{
             //parse request line and extract the request_type:
             String RequestLine = RTSPBufferedReader.readLine();

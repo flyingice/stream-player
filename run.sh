@@ -12,6 +12,9 @@ echo "Starting server ..."
 java -classpath "$TARGET" Server "$SERVER_PORT" &
 echo "Server started."
 
+# wait for the sever to fully start before running the client
+sleep 5
+
 # start streaming client
 echo "Starting client ..."
 java -classpath "$TARGET" Client "$SERVER_NAME" "$SERVER_PORT" "$MEDIA" &

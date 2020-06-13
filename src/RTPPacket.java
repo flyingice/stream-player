@@ -47,14 +47,22 @@ public class RTPPacket{
 		//--------------------------
 		header = new byte[HEADER_SIZE];
 
-		//.............
 		//TO COMPLETE
 		//.............
 		//fill the header array of byte with RTP header fields
+        header[0] |= (byte)(Version << 6);
+        header[0] |= (byte)(Padding << 5);
+        header[0] |= (byte)(Extension << 4);
+        header[0] |= (byte)(CC);
 
-		//header[0] = ...
-		// .....
+        header[1] |= (byte)(Marker << 7);
+        header[1] |= (byte)(PayloadType);
 
+        fill_bytes_from_int(header, 2, 2, SequenceNumber);
+
+        fill_bytes_from_int(header, 4, 4, TimeStamp);
+
+        fill_bytes_from_int(header, 8, 4, Ssrc);
 
 		//fill the payload bitstream:
 		//--------------------------
@@ -62,10 +70,9 @@ public class RTPPacket{
 		payload = new byte[data_length];
 
 		//fill payload array of byte from data (given in parameter of the constructor)
-		//......
-
-		// ! Do not forget to uncomment method printheader() below !
-
+        for(int i = 0; i < payload_size; i++) {
+            payload[i] = data[i];
+        }
 	}
 
 	//--------------------------
@@ -170,8 +177,6 @@ public class RTPPacket{
 	//--------------------------
 	public void printheader()
 	{
-		//TO DO: uncomment
-		/*
 		   for (int i=0; i < (HEADER_SIZE-4); i++)
 		   {
 		   for (int j = 7; j>=0 ; j--)
@@ -183,7 +188,6 @@ public class RTPPacket{
 		   }
 
 		   System.out.println();
-		   */
 	}
 
 	//return the unsigned value of 8-bit integer nb
@@ -194,4 +198,9 @@ public class RTPPacket{
 			return(256+nb);
 	}
 
+    static void fill_bytes_from_int(byte[] b, int offset, int len, int n) {
+        for(int i = 0; i < len; i++) {
+           b[offset + i] = (byte)(i < len - 1 ? n >> (len * 8 - (i + 1) * 8) : n & 0xFF);
+        }
+    }
 }

@@ -302,8 +302,8 @@ public class Client{
                 //receive the DP from the socket:
                 RTPsocket.receive(rcvdp);
 
-                //create an RTPPacket object from the DP
-                RTPPacket rtp_packet = new RTPPacket(rcvdp.getData(), rcvdp.getLength());
+                //create an RTPpacket object from the DP
+                RTPpacket rtp_packet = new RTPpacket(rcvdp.getData(), rcvdp.getLength());
 
                 //print important header fields of the RTP packet received: 
                 System.out.println("Got RTP packet with SeqNum # "+rtp_packet.getsequencenumber()+" TimeStamp "+rtp_packet.gettimestamp()+" ms, of type "+rtp_packet.getpayloadtype());
@@ -311,7 +311,7 @@ public class Client{
                 //print header bitstream:
                 rtp_packet.printheader();
 
-                //get the payload bitstream from the RTPPacket object
+                //get the payload bitstream from the RTPpacket object
                 int payload_length = rtp_packet.getpayload_length();
                 byte [] payload = new byte[payload_length];
                 rtp_packet.getpayload(payload);

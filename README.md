@@ -44,27 +44,32 @@ There are 4 classes in the assignment.
     This class is used to read video data from the file on disk. You do
     not need to modify this class.
 
+### Compiling the Code
+
+            ./build.sh
+
 ### Running the Code
 
 **After completing the code, you can run it as follows**.
 
-First, start the server with the command
+Start the baseline server
 
-            java Server server_port
+            ./run.sh
 
-where `server_port` is the port your server listens to for incoming RTSP
-connections. The standard RTSP port is 554, but you will need to choose
-a port number greater than 1024.
+or alternatively,
 
-Then, start the client with the command
+            ./run.sh Server
 
-            java Client server_name server_port video_file
+Start the funky server
 
-where `server_host` is the name of the machine where the server is
-running, `server_port` is the port the server is listening on, and
-`video_file` is the name of the file you want to request (we have
-provided one example file `movie.Mjpeg`). The file format is described
-in the [Appendix](#appendix).
+            ./run.sh FunkyServer
+
+In the script [run.sh](run.sh), `SERVER_PORT` is the port your server listens to for incoming RTSP connections.
+The standard RTSP port is 554, but we choose 1554 here so that the port number is greater than 1024.
+
+`SERVER_NAME` is the name of the machine where the server is running, and `MEDIA` is the name of the file
+you want to request (we have provided one example file `movie.mjpeg`). The file format is described in the
+[Appendix](#appendix).
 
 The client opens a connection to the server and pops up a window like
 this:
@@ -145,7 +150,7 @@ header is CSeq, and the second one is either Transport (for SETUP) or
 Session (for all other requests). In the reply, CSeq is again the first
 and Session is the second.
 
-    C: SETUP movie.Mjpeg RTSP/1.0
+    C: SETUP movie.mjpeg RTSP/1.0
     C: CSeq: 1
     C: Transport: RTP/UDP; client_port= 25000
 
@@ -153,7 +158,7 @@ and Session is the second.
     S: CSeq: 1
     S: Session: 123456
 
-    C: PLAY movie.Mjpeg RTSP/1.0
+    C: PLAY movie.mjpeg RTSP/1.0
     C: CSeq: 2
     C: Session: 123456
 
@@ -161,7 +166,7 @@ and Session is the second.
     S: CSeq: 2
     S: Session: 123456
 
-    C: PAUSE movie.Mjpeg RTSP/1.0
+    C: PAUSE movie.mjpeg RTSP/1.0
     C: CSeq: 3
     C: Session: 123456
 
@@ -169,7 +174,7 @@ and Session is the second.
     S: CSeq: 3
     S: Session: 123456
 
-    C: PLAY movie.Mjpeg RTSP/1.0
+    C: PLAY movie.mjpeg RTSP/1.0
     C: CSeq: 4
     C: Session: 123456
 
@@ -177,7 +182,7 @@ and Session is the second.
     S: CSeq: 4
     S: Session: 123456
 
-    C: TEARDOWN movie.Mjpeg RTSP/1.0
+    C: TEARDOWN movie.mjpeg RTSP/1.0
     C: CSeq: 5
     C: Session: 123456
 

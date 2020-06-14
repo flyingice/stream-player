@@ -43,6 +43,7 @@ public class Client{
     final static int PLAYING = 2;
     static int state; //RTSP state == INIT or READY or PLAYING
     Socket RTSPsocket; //socket used to send/receive RTSP messages
+    int RTPSeqNb = 0;  //largest sequence number of the RTP packet that has been played
     //input and output stream filters
     static BufferedReader RTSPBufferedReader;
     static BufferedWriter RTSPBufferedWriter;
@@ -311,18 +312,22 @@ public class Client{
                 //print header bitstream:
                 rtp_packet.printheader();
 
-                //get the payload bitstream from the RTPpacket object
-                int payload_length = rtp_packet.getpayload_length();
-                byte [] payload = new byte[payload_length];
-                rtp_packet.getpayload(payload);
+                if (rtp_packet.getsequencenumber() > RTPSeqNb) { // discard out-of-date packet
+                    //get the payload bitstream from the RTPpacket object
+                    int payload_length = rtp_packet.getpayload_length();
+                    byte [] payload = new byte[payload_length];
+                    rtp_packet.getpayload(payload);
 
-                //get an Image object from the payload bitstream
-                Toolkit toolkit = Toolkit.getDefaultToolkit();
-                Image image = toolkit.createImage(payload, 0, payload_length);
+                    //get an Image object from the payload bitstream
+                    Toolkit toolkit = Toolkit.getDefaultToolkit();
+                    Image image = toolkit.createImage(payload, 0, payload_length);
 
-                //display the image as an ImageIcon object
-                icon = new ImageIcon(image);
-                iconLabel.setIcon(icon);
+                    //display the image as an ImageIcon object
+                    icon = new ImageIcon(image);
+                    iconLabel.setIcon(icon);
+
+                    RTPSeqNb = rtp_packet.getsequencenumber();
+                }
             }
             catch (InterruptedIOException iioe){
                 // nothing to read

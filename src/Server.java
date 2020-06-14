@@ -202,8 +202,8 @@ public class Server extends JFrame implements ActionListener {
                 //get next frame to send from the video, as well as its size
                 int image_length = video.getnextframe(buf);
 
-                //Builds an RTPPacket object containing the frame
-                RTPPacket rtp_packet = new RTPPacket(MJPEG_TYPE, imagenb, imagenb*FRAME_PERIOD, buf, image_length);
+                //Builds an RTPpacket object containing the frame
+                RTPpacket rtp_packet = new RTPpacket(MJPEG_TYPE, imagenb, imagenb*FRAME_PERIOD, buf, image_length);
 
                 //get to total length of the full rtp packet to send
                 int packet_length = rtp_packet.getlength();

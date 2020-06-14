@@ -1,6 +1,6 @@
-//class RTPPacket
+//class RTPpacket
 
-public class RTPPacket{
+public class RTPpacket{
 
 	//size of the RTP header:
 	static int HEADER_SIZE = 12;
@@ -27,9 +27,9 @@ public class RTPPacket{
 
 
 	//--------------------------
-	//Constructor of an RTPPacket object from header fields and payload bitstream
+	//Constructor of an RTPpacket object from header fields and payload bitstream
 	//--------------------------
-	public RTPPacket(int PType, int Framenb, int Time, byte[] data, int data_length){
+	public RTPpacket(int PType, int Framenb, int Time, byte[] data, int data_length){
 		//fill by default header fields:
 		Version = 2;
 		Padding = 0;
@@ -76,9 +76,9 @@ public class RTPPacket{
 	}
 
 	//--------------------------
-	//Constructor of an RTPPacket object from the packet bistream 
+	//Constructor of an RTPpacket object from the packet bistream
 	//--------------------------
-	public RTPPacket(byte[] packet, int packet_size)
+	public RTPpacket(byte[] packet, int packet_size)
 	{
 		//fill default fields:
 		Version = 2;
@@ -110,7 +110,7 @@ public class RTPPacket{
 	}
 
 	//--------------------------
-	//getpayload: return the payload bistream of the RTPPacket and its size
+	//getpayload: return the payload bistream of the RTPpacket and its size
 	//--------------------------
 	public int getpayload(byte[] data) {
 

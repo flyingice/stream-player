@@ -42,6 +42,9 @@ public class Client{
     final static int READY = 1;
     final static int PLAYING = 2;
     static int state; //RTSP state == INIT or READY or PLAYING
+
+    final static int TIMER_INTERVAL = 20; // timer cycle in ms
+
     Socket RTSPsocket; //socket used to send/receive RTSP messages
     int RTPSeqNb = 0;  //largest sequence number of the RTP packet that has been played
     //input and output stream filters
@@ -52,6 +55,11 @@ public class Client{
     int RTSPid = 0; //ID of the RTSP session (given by the RTSP Server)
 
     final static String CRLF = "\r\n";
+
+    // for the sake of statistics
+    int lostPacketNb = 0; // total number of lost packets
+    int lastTimeCount = 0; // timestamp of the last acknowledged RTP packet
+    int totalTimeCount = 0; // current timestamp
 
     //Video constants:
     //------------------
@@ -102,7 +110,7 @@ public class Client{
 
         //init timer
         //--------------------------
-        timer = new Timer(20, new timerListener());
+        timer = new Timer(TIMER_INTERVAL, new timerListener());
         timer.setInitialDelay(0);
         timer.setCoalesce(true);
 
@@ -296,6 +304,8 @@ public class Client{
     class timerListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
 
+            totalTimeCount++;
+
             //Construct a DatagramPacket to receive data from the UDP socket
             rcvdp = new DatagramPacket(buf, buf.length);
 
@@ -326,6 +336,13 @@ public class Client{
                     icon = new ImageIcon(image);
                     iconLabel.setIcon(icon);
 
+                    // print stats
+                    System.out.printf("Loss rate: %.2f%%\n", calculate_loss_rate(rtp_packet));
+                    System.out.printf("Video rate: %.2f KB/s\n", calculate_video_rate(rtp_packet));
+
+                    // housekeeping
+                    lostPacketNb += (rtp_packet.getsequencenumber() - RTPSeqNb - 1);
+                    lastTimeCount = totalTimeCount;
                     RTPSeqNb = rtp_packet.getsequencenumber();
                 }
             }
@@ -413,6 +430,15 @@ public class Client{
             System.exit(0);
         }
     }
+
+    private double calculate_loss_rate(RTPpacket packet) {
+        return (lostPacketNb + packet.getsequencenumber() - RTPSeqNb - 1) * 100.0 / packet.getsequencenumber();
+    }
+
+    private double calculate_video_rate(RTPpacket packet) {
+        return packet.getlength() / 1.0 / (totalTimeCount - lastTimeCount) / TIMER_INTERVAL;
+    }
+
 
 }//end of Class Client
 

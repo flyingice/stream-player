@@ -16,7 +16,6 @@ public class Client{
     //GUI
     //----
     JFrame f = new JFrame("Client");
-    JButton setupButton = new JButton("Setup");
     JButton playButton = new JButton("Play");
     JButton pauseButton = new JButton("Pause");
     JButton tearButton = new JButton("Teardown");
@@ -82,14 +81,12 @@ public class Client{
 
         //Buttons
         buttonPanel.setLayout(new GridLayout(1,0));
-        buttonPanel.add(setupButton);
         buttonPanel.add(playButton);
         buttonPanel.add(pauseButton);
         buttonPanel.add(tearButton);
-        playButton.setEnabled(false);
+        playButton.setEnabled(true);
         pauseButton.setEnabled(false);
         tearButton.setEnabled(false);
-        setupButton.addActionListener(new setupButtonListener());
         playButton.addActionListener(new playButtonListener());
         pauseButton.addActionListener(new pauseButtonListener());
         tearButton.addActionListener(new tearButtonListener());
@@ -156,48 +153,40 @@ public class Client{
     //TO COMPLETE
     //.............
 
-    //Handler for Setup button
-    //-----------------------
-    class setupButtonListener implements ActionListener{
-        public void actionPerformed(ActionEvent e){
+    private void init() {
+        System.out.println("Initialzing session ...");
 
-            System.out.println("Setup Button pressed !");
+        //Init non-blocking RTPsocket that will be used to receive data
+        try{
+            //construct a new DatagramSocket to receive RTP packets from the server, on port RTP_RCV_PORT
+            RTPsocket = new DatagramSocket(RTP_RCV_PORT);
+            //set TimeOut value of the socket to 5msec.
+            RTPsocket.setSoTimeout(5);
+        }
+        catch (SocketException se)
+        {
+            System.out.println("Socket exception: "+se);
+            System.exit(0);
+        }
+
+        //init RTSP sequence number
+        RTSPSeqNb = 1;
+
+        //Send SETUP message to the server
+        send_RTSP_request("SETUP");
+
+        //Wait for the response
+        if (parse_server_response() != 200)
+            System.out.println("Invalid Server Response");
+        else
+        {
+            //change RTSP state and print new state
+            state = READY;
+            System.out.println("New RTSP state: READY");
 
             playButton.setEnabled(true);
             pauseButton.setEnabled(true);
             tearButton.setEnabled(true);
-
-            if (state == INIT) 
-            {
-                //Init non-blocking RTPsocket that will be used to receive data
-                try{
-                    //construct a new DatagramSocket to receive RTP packets from the server, on port RTP_RCV_PORT
-                    RTPsocket = new DatagramSocket(RTP_RCV_PORT);
-                    //set TimeOut value of the socket to 5msec.
-                    RTPsocket.setSoTimeout(5);
-                }
-                catch (SocketException se)
-                {
-                    System.out.println("Socket exception: "+se);
-                    System.exit(0);
-                }
-
-                //init RTSP sequence number
-                RTSPSeqNb = 1;
-
-                //Send SETUP message to the server
-                send_RTSP_request("SETUP");
-
-                //Wait for the response 
-                if (parse_server_response() != 200)
-                    System.out.println("Invalid Server Response");
-                else 
-                {
-                    //change RTSP state and print new state 
-                    state = READY;
-                    System.out.println("New RTSP state: READY");
-                }
-            }//else if state != INIT then do nothing
         }
     }
 
@@ -207,6 +196,11 @@ public class Client{
         public void actionPerformed(ActionEvent e){
 
             System.out.println("Play Button pressed !");
+
+            // The first time when the play button is clicked
+            if (state == INIT) {
+                init();
+            }
 
             if (state == READY) 
             {
@@ -227,6 +221,9 @@ public class Client{
 
                     //start the timer
                     timer.start();
+
+                    playButton.setEnabled(false);
+                    pauseButton.setEnabled(true);
                 }
             }//else if state != READY then do nothing
         }
@@ -259,6 +256,9 @@ public class Client{
 
                     //stop the timer
                     timer.stop();
+
+                    playButton.setEnabled(true);
+                    pauseButton.setEnabled(false);
                 }
             }
             //else if state != PLAYING then do nothing
